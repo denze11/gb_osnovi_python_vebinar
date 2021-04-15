@@ -1,0 +1,13 @@
+numbers = [2, 2, 2, 7, 23, 1, 44, 44, 3, 2, 10, 7, 4, 11]
+
+
+def unique_numbers(item):
+    unique = []
+
+    for i in numbers:
+        if numbers.count(i) == 1:
+            unique.append(i)
+    return unique
+
+
+print(unique_numbers(numbers))
