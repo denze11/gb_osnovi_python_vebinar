@@ -1,42 +1,101 @@
-class Textil:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
+from abc import ABC, abstractmethod
 
-    def get_square_c(self):
-        return self.width / 6.5 + 0.5
+from typing import Any
 
-    def get_square_j(self):
-        return self.height * 2 + 0.3
+
+class AbstractTextil(ABC):
+    @property
+    @abstractmethod
+    def required_fabric(self):
+        pass
 
     @property
-    def get_sq_full(self):
-        return str(f'Площадь общая ткани \n'
-                   f' {(self.width / 6.5 + 0.5) + (self.height * 2 + 0.3)}')
+    @abstractmethod
+    def dimension(self):
+        pass
+
+    @abstractmethod
+    def _calc_required_fabric(self):
+        pass
+
+
+class Textil(AbstractTextil):
+    _textil = []
+
+    def __init__(self, name: str, dimension: Any):
+        self.name = name
+        self._dimension = dimension
+        self._required_fabric = None
+
+        self._textil.append(self)
+
+    def _calc_required_fabric(self):
+        raise NotImplemented
+
+    @property
+    def required_fabric(self) -> float:
+        if not self._required_fabric:
+            self._calc_required_fabric()
+
+        return self._required_fabric
+
+    @property
+    def dimension(self) -> Any:
+        return self._dimension
+
+    @dimension.setter
+    def dimension(self, dimension: Any):
+        self._dimension = dimension
+        self._required_fabric = None
+
+    @property
+    def total_required_fabric(self):
+        return sum([item.required_fabric for item in self._textil])
 
 
 class Coat(Textil):
-    def __init__(self, width, height):
-        super().__init__(width, height)
-        self.square_c = round(self.width / 6.5 + 0.5)
+    def _calc_required_fabric(self):
+        self._required_fabric = round(self.dimension / 6.5 + 0.5, 2)
+
+    @property
+    def V(self) -> Any:
+        return self.dimension
+
+    @V.setter
+    def V(self, size: Any):
+        self.dimension = size
 
     def __str__(self):
-        return f'Площадь на пальто {self.square_c}'
+        return f"Для пальто {self.dimension} размера " \
+               f"необходимо {self.required_fabric} кв. метров ткани"
 
 
-class Jacket(Textil):
-    def __init__(self, width, height):
-        super().__init__(width, height)
-        self.square_j = round(self.height * 2 + 0.3)
+class Suit(Textil):
+    def _calc_required_fabric(self):
+        self._required_fabric = round(2 * self.dimension * 0.01 + 0.3, 2)
+
+    @property
+    def H(self) -> Any:
+        return self.dimension
+
+    @H.setter
+    def H(self, height: Any):
+        self.dimension = height
 
     def __str__(self):
-        return f'Площадь на костюм {self.square_j}'
+        return f"Для костюма на рост {self.dimension} см. " \
+               f"необходимо {self.required_fabric} кв. метров ткани"
 
-coat = Coat(2, 4)
-jacket = Jacket(1, 2)
+
+coat = Coat('Пальто от Chanel', 7)
 print(coat)
-print(jacket)
-print(coat.get_sq_full)
-print(jacket.get_sq_full)
-print(jacket.get_square_c())
-print(jacket.get_square_j())
+coat.V = 8
+print(coat)
+
+suit = Suit('Костюм от Stuart Hughes', 173)
+print(suit)
+suit.H = 180
+print(suit)
+
+print(coat.total_required_fabric)
+print(suit.total_required_fabric)
